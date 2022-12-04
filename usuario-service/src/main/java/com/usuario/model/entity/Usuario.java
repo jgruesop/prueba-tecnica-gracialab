@@ -2,6 +2,8 @@ package com.usuario.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.springframework.data.annotation.PersistenceConstructor;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -23,7 +25,11 @@ public class Usuario implements Serializable {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Rol roles;
 
-    public Usuario(String nombre, String apellido, String email, String password, Rol roles) {
+    public static Usuario of(String nombre, String apellido, String email, String password, Rol roles) {
+        return new Usuario(null, nombre, apellido, email, password, roles);
+    }
+
+    private Usuario(String nombre, String apellido, String email, String password, Rol roles) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;

@@ -54,7 +54,7 @@ public class UsuarioLogic {
                 if(validarExistenciaUsuarioPorEmail(usuarioRegistroDTO.getEmail()) == null) {
                     String encriptMD5 = DigestUtils.md5DigestAsHex(usuarioRegistroDTO.getPassword().getBytes());
                     Rol rol = new Rol(usuarioRegistroDTO.getRol().trim().toLowerCase());
-                    Usuario usuario = new Usuario(usuarioRegistroDTO.getNombre().trim().toLowerCase(),
+                    Usuario usuario = new Usuario(null, usuarioRegistroDTO.getNombre().trim().toLowerCase(),
                             usuarioRegistroDTO.getApellido().trim().toLowerCase(),
                             usuarioRegistroDTO.getEmail().trim(),
                             encriptMD5, rol );
