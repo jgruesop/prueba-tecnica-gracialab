@@ -8,6 +8,7 @@ import com.usuario.pojo.RespuestaMensajePojo;
 import com.usuario.service.IUsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
@@ -25,10 +26,12 @@ public class UsuarioLogic {
                     + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
     private final IUsuarioService usuarioService;
     private final MensajesError mensajesError;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioLogic(IUsuarioService usuarioService, MensajesError mensajesError) {
+    public UsuarioLogic(IUsuarioService usuarioService, MensajesError mensajesError, PasswordEncoder passwordEncoder) {
         this.usuarioService = usuarioService;
         this.mensajesError = mensajesError;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public ResponseEntity validarUsuario(UsuarioRegistroDTO usuarioRegistroDTO) {
@@ -52,14 +55,12 @@ public class UsuarioLogic {
             }
             else {
                 if(validarExistenciaUsuarioPorEmail(usuarioRegistroDTO.getEmail()) == null) {
-                    String encriptMD5 = DigestUtils.md5DigestAsHex(usuarioRegistroDTO.getPassword().getBytes());
                     Rol rol = new Rol(usuarioRegistroDTO.getRol().trim().toLowerCase());
-                    Usuario usuario = new Usuario(null, usuarioRegistroDTO.getNombre().trim().toLowerCase(),
+                    guardarRol(rol);
+                    guardarUsuario(Usuario.of(usuarioRegistroDTO.getNombre().trim().toLowerCase(),
                             usuarioRegistroDTO.getApellido().trim().toLowerCase(),
                             usuarioRegistroDTO.getEmail().trim(),
-                            encriptMD5, rol );
-                    guardarRol(rol);
-                    guardarUsuario(usuario);
+                            passwordEncoder.encode(usuarioRegistroDTO.getPassword()), rol ));
                     return mensajesError.registroExitoso();
                 }else {
                     return validarExistenciaUsuarioPorEmail(usuarioRegistroDTO.getEmail());
