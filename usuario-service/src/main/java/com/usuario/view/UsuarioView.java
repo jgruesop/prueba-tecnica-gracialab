@@ -15,6 +15,8 @@ public class UsuarioView {
         this.authController = authController;
     }
 
+
+
     @GetMapping("/listar-usuarios")
     public ResponseEntity listarUsuarios() throws Exception {
         return this.authController.listarUsuarios();
@@ -23,7 +25,6 @@ public class UsuarioView {
     public ResponseEntity registrar(@RequestBody UsuarioRegistroDTO usuarioRegistroDTO) throws Exception {
             return this.authController.registrar(usuarioRegistroDTO);
     }
-
     @PutMapping("/usuarios")
     public ResponseEntity modificar(@RequestBody UsuarioRegistroDTO usuarioRegistroDTO) throws Exception {
         return this.authController.modificar(usuarioRegistroDTO);

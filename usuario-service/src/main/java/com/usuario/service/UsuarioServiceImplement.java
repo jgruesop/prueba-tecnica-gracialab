@@ -3,7 +3,7 @@ package com.usuario.service;
 import com.usuario.model.dao.IUsuarioDao;
 import com.usuario.model.entity.Rol;
 import com.usuario.model.entity.Usuario;
-import com.usuario.pojo.ResponseUsuarioPojo;
+import com.usuario.pojo.RespuestaUsuarioPojo;
 import com.usuario.repository.IRolRepository;
 import com.usuario.repository.IUsuarioRepository;
 import org.springframework.http.HttpStatus;
@@ -38,19 +38,19 @@ public class UsuarioServiceImplement implements IUsuarioService{
     @Override
     public ResponseEntity buscarUsuario(Integer id) {
         List<Usuario> resultado = iUsuarioDao.buscarIdUsuario(id);
-        ResponseUsuarioPojo responseUsuarioPojo = new ResponseUsuarioPojo();
+        RespuestaUsuarioPojo respuestaUsuarioPojo = new RespuestaUsuarioPojo();
         if(!resultado.isEmpty()) {
             for(Usuario usuario : resultado) {
-                responseUsuarioPojo.setId(usuario.getId());
-                responseUsuarioPojo.setNombre(usuario.getNombre());
-                responseUsuarioPojo.setApellido(usuario.getApellido());
-                responseUsuarioPojo.setEmail(usuario.getEmail());
-                responseUsuarioPojo.setRol(String.valueOf((usuario.getRoles())));
+                respuestaUsuarioPojo.setId(usuario.getId());
+                respuestaUsuarioPojo.setNombre(usuario.getNombre());
+                respuestaUsuarioPojo.setApellido(usuario.getApellido());
+                respuestaUsuarioPojo.setEmail(usuario.getEmail());
+                respuestaUsuarioPojo.setRol(String.valueOf((usuario.getRoles())));
             }
         }else {
             return new ResponseEntity("Usuario no existe", HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(responseUsuarioPojo, HttpStatus.OK);
+        return new ResponseEntity(respuestaUsuarioPojo, HttpStatus.OK);
     }
 
     @Override
@@ -60,8 +60,7 @@ public class UsuarioServiceImplement implements IUsuarioService{
 
     @Override
     public String buscarEmail(String email) {
-        String emailDB = iUsuarioDao.buscarEmail(email);
-        return emailDB;
+        return iUsuarioDao.buscarEmail(email);
     }
 
     @Override

@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter @Setter
 @AllArgsConstructor
-public class ResponseMensajePojo {
+public class RespuestaMensajePojo {
 
     private String mensaje;
 
