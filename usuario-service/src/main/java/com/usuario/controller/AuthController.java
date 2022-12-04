@@ -14,6 +14,9 @@ public class AuthController {
         this.usuarioLogic = usuarioLogic;
     }
 
+    public String login() {
+        return "Hello World!";
+    }
     public ResponseEntity listarUsuarios() {
         return this.usuarioLogic.listarUsuarios();
     }
