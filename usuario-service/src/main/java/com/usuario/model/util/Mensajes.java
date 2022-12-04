@@ -20,6 +20,7 @@ public class Mensajes {
     public static final String CAMBIOS_APLICADOS_EXITOSAMENTE     = "Cambios aplicados exitosamente";
     public static final String USUARIO_NO_EXISTE                  = "Usuario no existe";
     public static final String NO_EXISTEN_REGISTROS               = "No existen registros";
+    public static final String USUARIO_SIN_PERMISOS               = "Usuario sin permisos";
 
     public ResponseEntity noExistenResgistros() {
         RespuestaMensajePojo respuestaMensajePojo = new RespuestaMensajePojo(NO_EXISTEN_REGISTROS);
@@ -66,4 +67,8 @@ public class Mensajes {
         return new ResponseEntity(respuestaMensajePojo, HttpStatus.BAD_REQUEST);
     }
 
+    public ResponseEntity usuarioSinPermisos() {
+        RespuestaMensajePojo respuestaMensajePojo = new RespuestaMensajePojo(USUARIO_SIN_PERMISOS);
+        return new ResponseEntity(respuestaMensajePojo, HttpStatus.UNAUTHORIZED);
+    }
 }

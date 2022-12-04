@@ -14,7 +14,7 @@ public interface IUsuarioService {
 
     Usuario registrarUsuario(Usuario usuario);
 
-    Optional<Usuario> buscarEmail(String email);
+    String buscarEmail(String email);
 
     ResponseEntity<Usuario> modificarUsuario(Usuario usuario);
 

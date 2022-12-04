@@ -35,26 +35,25 @@ public class UsuarioLogic {
     }
 
     public ResponseEntity validarUsuario(UsuarioRegistroDTO usuarioRegistroDTO) {
-        Matcher mather = pattern.matcher(usuarioRegistroDTO.getEmail());
+        Matcher mather = pattern.matcher(usuarioRegistroDTO.getEmail());        
         try{
             if(Objects.isNull(usuarioRegistroDTO.getNombre()) || usuarioRegistroDTO.getNombre().isEmpty()) {
                 return mensajes.validarInformacionNombres();
             }
-            else if(Objects.isNull(usuarioRegistroDTO.getApellido()) || usuarioRegistroDTO.getApellido().isEmpty()) {
+            if(Objects.isNull(usuarioRegistroDTO.getApellido()) || usuarioRegistroDTO.getApellido().isEmpty()) {
                 return mensajes.validarInformacionApellidos();
             }
-            else if(Objects.isNull(usuarioRegistroDTO.getEmail()) || usuarioRegistroDTO.getEmail().isEmpty()
+            if(Objects.isNull(usuarioRegistroDTO.getEmail()) || usuarioRegistroDTO.getEmail().isEmpty()
                         || mather.find() == false) {
                 return mensajes.validarInformacionEmail();
             }
-            else if(Objects.isNull(usuarioRegistroDTO.getPassword()) || usuarioRegistroDTO.getPassword().isEmpty()) {
+            if(Objects.isNull(usuarioRegistroDTO.getPassword()) || usuarioRegistroDTO.getPassword().isEmpty()) {
                 return mensajes.validarInformacionPassword();
             }
-            else if(Objects.isNull(usuarioRegistroDTO.getRol()) || usuarioRegistroDTO.getRol().isEmpty()) {
+            if(Objects.isNull(usuarioRegistroDTO.getRol()) || usuarioRegistroDTO.getRol().isEmpty()) {
                 return mensajes.validarInformacionRol();
             }
-            else {
-                if(validarExistenciaUsuarioPorEmail(usuarioRegistroDTO.getEmail()) == null) {
+            if(validarExistenciaUsuarioPorEmail(usuarioRegistroDTO.getEmail()) == null) {
                     Rol rol = new Rol(usuarioRegistroDTO.getRol().trim().toLowerCase());
                     guardarRol(rol);
                     guardarUsuario(Usuario.of(usuarioRegistroDTO.getNombre().trim().toLowerCase(),
@@ -62,10 +61,8 @@ public class UsuarioLogic {
                             usuarioRegistroDTO.getEmail().trim(),
                             passwordEncoder.encode(usuarioRegistroDTO.getPassword()), rol ));
                     return mensajes.registroExitoso();
-                }else {
-                    return validarExistenciaUsuarioPorEmail(usuarioRegistroDTO.getEmail());
-                }
-
+            }else {
+                return validarExistenciaUsuarioPorEmail(usuarioRegistroDTO.getEmail());
             }
         } catch (Exception e) {
             LOGGER.info("Se produjo un error: " + e.getMessage());
@@ -75,8 +72,9 @@ public class UsuarioLogic {
 
     public ResponseEntity<RespuestaMensajePojo> validarExistenciaUsuarioPorEmail(String email) {
         RespuestaMensajePojo responseMensaje = new RespuestaMensajePojo("El usuario ya exite");
-        String emailBD = String.valueOf(usuarioService.buscarEmail(email));
-        if(email.equals(emailBD)) {
+        String emailBD = (usuarioService.buscarEmail(email));
+        System.out.println("emailBD = " + emailBD);
+        if(email.matches(emailBD)) {
             return new ResponseEntity<>(responseMensaje, HttpStatus.BAD_REQUEST);
         }
         return null;
@@ -97,13 +95,15 @@ public class UsuarioLogic {
     public ResponseEntity login(LoginRegistroDTO loginRegistroDTO) {
         var usuario = usuarioService.login(loginRegistroDTO.getEmail(), loginRegistroDTO.getPassword())
                 .orElse(null);
-        if(usuario.getPassword().isEmpty() || usuario.equals(null))
+        if(Objects.isNull(usuario))
             return mensajes.credencialesNoCoinciden();
 
         if(!passwordEncoder.matches(loginRegistroDTO.getPassword(), usuario.getPassword()))
             return mensajes.credencialesNoCoinciden();
 
+        if(!usuario.getRoles().getNombre().equals("ADMIN") && !usuario.getRoles().getNombre().equals("admin"))
+            return mensajes.usuarioSinPermisos();
+
         return mensajes.loginExitoso();
     }
-
 }

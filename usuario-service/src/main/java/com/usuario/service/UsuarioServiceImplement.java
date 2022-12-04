@@ -65,8 +65,8 @@ public class UsuarioServiceImplement implements IUsuarioService{
     }
 
     @Override
-    public Optional<Usuario> buscarEmail(String email) {
-        return iUsuarioRepository.findByEmail(email);
+    public String buscarEmail(String email) {
+        return iUsuarioRepository.buscarEmail(email);
     }
 
     @Override

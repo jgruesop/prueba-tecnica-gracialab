@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   `id_rol` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE IF EXISTS `usuario`
+  ADD CONSTRAINT IF NOT EXISTS UNIQUE KEY `email` (`email`),
+
 CREATE TABLE IF NOT EXISTS `rol` (
   `id` int(11) NOT NULL,
   `nombre` varchar(255) DEFAULT NULL

@@ -21,16 +21,16 @@ public class UsuarioView {
     public ResponseEntity login(@RequestBody LoginRegistroDTO loginRequestDTO) {
         return this.authController.login(loginRequestDTO);
     }
-    @PostMapping("/registro")
+    @PostMapping("/usuario/registro")
     public ResponseEntity registrar(@RequestBody UsuarioRegistroDTO usuarioRegistroDTO) throws Exception {
         return this.authController.registrar(usuarioRegistroDTO);
     }
-    @GetMapping("/listar-usuarios")
+    @GetMapping("/usuario/listar")
     public ResponseEntity listarUsuarios() throws Exception {
         return this.authController.listarUsuarios();
     }
 
-    @PutMapping("/usuarios")
+    @PutMapping("/usuario/modificar")
     public ResponseEntity modificar(@RequestBody UsuarioRegistroDTO usuarioRegistroDTO) throws Exception {
         return this.authController.modificar(usuarioRegistroDTO);
     }
