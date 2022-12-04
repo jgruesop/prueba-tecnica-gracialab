@@ -1,43 +1,49 @@
 package com.usuario.service;
 
-import com.usuario.model.dao.IUsuarioDao;
 import com.usuario.model.entity.Rol;
 import com.usuario.model.entity.Usuario;
+import com.usuario.model.util.Mensajes;
 import com.usuario.pojo.RespuestaUsuarioPojo;
 import com.usuario.repository.IRolRepository;
 import com.usuario.repository.IUsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioServiceImplement implements IUsuarioService{
 
     private final IUsuarioRepository usuarioRepository;
-    private final IUsuarioDao iUsuarioDao;
+    private final IUsuarioRepository iUsuarioRepository;
     private final IRolRepository rolRepository;
+    private final Mensajes mensajes;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioServiceImplement(IUsuarioRepository usuarioRepository, IUsuarioDao iUsuarioDao, IRolRepository rolRepository) {
+    public UsuarioServiceImplement(IUsuarioRepository usuarioRepository, IUsuarioRepository iUsuarioRepository, IRolRepository rolRepository, Mensajes mensajes, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
-        this.iUsuarioDao = iUsuarioDao;
+        this.iUsuarioRepository = iUsuarioRepository;
         this.rolRepository = rolRepository;
+        this.mensajes = mensajes;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity listarUsuarios() {
-        if(!iUsuarioDao.findAll().iterator().hasNext()) {
-            return new ResponseEntity("No existen registros", HttpStatus.NOT_FOUND);
+        if(!iUsuarioRepository.findAll().iterator().hasNext()) {
+            return mensajes.noExistenResgistros();
         }
         return new ResponseEntity(usuarioRepository.findAll(), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity buscarUsuario(Integer id) {
-        List<Usuario> resultado = iUsuarioDao.buscarIdUsuario(id);
+        List<Usuario> resultado = iUsuarioRepository.buscarIdUsuario(id);
         RespuestaUsuarioPojo respuestaUsuarioPojo = new RespuestaUsuarioPojo();
         if(!resultado.isEmpty()) {
             for(Usuario usuario : resultado) {
@@ -48,7 +54,7 @@ public class UsuarioServiceImplement implements IUsuarioService{
                 respuestaUsuarioPojo.setRol(String.valueOf((usuario.getRoles())));
             }
         }else {
-            return new ResponseEntity("Usuario no existe", HttpStatus.NOT_FOUND);
+            return mensajes.usuarioNoExiste();
         }
         return new ResponseEntity(respuestaUsuarioPojo, HttpStatus.OK);
     }
@@ -59,13 +65,13 @@ public class UsuarioServiceImplement implements IUsuarioService{
     }
 
     @Override
-    public String buscarEmail(String email) {
-        return iUsuarioDao.buscarEmail(email);
+    public Optional<Usuario> buscarEmail(String email) {
+        return iUsuarioRepository.findByEmail(email);
     }
 
     @Override
     public ResponseEntity<Usuario> modificarUsuario(Usuario usuario) {
-        Usuario usuarioDB = (Usuario) iUsuarioDao.buscarIdUsuario(usuario.getId());
+        Usuario usuarioDB = (Usuario) iUsuarioRepository.buscarIdUsuario(usuario.getId());
         if (usuarioDB == null) {
             return null;
         }
@@ -75,11 +81,17 @@ public class UsuarioServiceImplement implements IUsuarioService{
         usuarioDB.setEmail(usuario.getEmail());
         usuarioDB.setPassword(usuario.getPassword());
         usuarioRepository.save(usuarioDB);
-        return new ResponseEntity("Cambios aplicados exitosamente", HttpStatus.OK);
+        return mensajes.cambiosAplicadosExitosamente();
     }
 
     @Override
     public Rol registrarRol(Rol rol) {
         return rolRepository.save(rol);
+    }
+
+    @Override
+    public Optional<Usuario> login(String email, String password) {
+        var usuario = usuarioRepository.findByEmail(email);
+        return usuario;
     }
 }

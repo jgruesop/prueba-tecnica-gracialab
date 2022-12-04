@@ -1,7 +1,9 @@
 package com.usuario.view;
 
 import com.usuario.controller.AuthController;
+import com.usuario.model.dto.LoginRegistroDTO;
 import com.usuario.model.dto.UsuarioRegistroDTO;
+import com.usuario.pojo.RespuestaMensajePojo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +17,9 @@ public class UsuarioView {
         this.authController = authController;
     }
 
-    @GetMapping("/login")
-    public String login(){
-        return this.authController.login();
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody LoginRegistroDTO loginRequestDTO) {
+        return this.authController.login(loginRequestDTO);
     }
     @PostMapping("/registro")
     public ResponseEntity registrar(@RequestBody UsuarioRegistroDTO usuarioRegistroDTO) throws Exception {

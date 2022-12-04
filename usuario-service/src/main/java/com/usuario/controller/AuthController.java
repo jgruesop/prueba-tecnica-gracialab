@@ -1,7 +1,9 @@
 package com.usuario.controller;
 
+import com.usuario.model.dto.LoginRegistroDTO;
 import com.usuario.model.dto.UsuarioRegistroDTO;
 import com.usuario.model.logic.UsuarioLogic;
+import com.usuario.pojo.RespuestaMensajePojo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +16,8 @@ public class AuthController {
         this.usuarioLogic = usuarioLogic;
     }
 
-    public String login() {
-        return "Hello World!";
+    public ResponseEntity login(@RequestBody LoginRegistroDTO loginRequestDTO) {
+        return this.usuarioLogic.login(loginRequestDTO);
     }
     public ResponseEntity listarUsuarios() {
         return this.usuarioLogic.listarUsuarios();
