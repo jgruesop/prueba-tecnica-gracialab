@@ -4,7 +4,6 @@ import com.usuario.pojo.RespuestaMensajePojo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class Mensajes {
@@ -15,12 +14,14 @@ public class Mensajes {
     public static final String ERROR_AL_REGISTRAR_EL_PASSWORD     = "Error al registrar el password";
     public static final String ERROR_AL_REGISTRAR_CAMPO_ROL       = "Error al registrar el campo rol";
     public static final String REGISTRO_EXITOSO                   = "Registro exitoso";
-    public static final String LOGIN_EXITOSO                      = "Login exitoso";
+    //public static final String LOGIN_EXITOSO                      = token.getToken();
     public static final String CREDENCIALES_NO_COINCIDEN          = "Credenciales invalidas";
     public static final String CAMBIOS_APLICADOS_EXITOSAMENTE     = "Cambios aplicados exitosamente";
     public static final String USUARIO_NO_EXISTE                  = "Usuario no existe";
     public static final String NO_EXISTEN_REGISTROS               = "No existen registros";
     public static final String USUARIO_SIN_PERMISOS               = "Usuario sin permisos";
+
+
 
     public ResponseEntity noExistenResgistros() {
         RespuestaMensajePojo respuestaMensajePojo = new RespuestaMensajePojo(NO_EXISTEN_REGISTROS);
@@ -37,10 +38,6 @@ public class Mensajes {
     public ResponseEntity credencialesNoCoinciden() {
         RespuestaMensajePojo respuestaMensajePojo = new RespuestaMensajePojo(CREDENCIALES_NO_COINCIDEN);
         return new ResponseEntity(respuestaMensajePojo, HttpStatus.BAD_REQUEST);
-    }
-    public ResponseEntity loginExitoso() {
-        RespuestaMensajePojo respuestaMensajePojo = new RespuestaMensajePojo(LOGIN_EXITOSO);
-        return new ResponseEntity(respuestaMensajePojo, HttpStatus.OK);
     }
     public ResponseEntity registroExitoso() {
         RespuestaMensajePojo respuestaMensajePojo = new RespuestaMensajePojo(REGISTRO_EXITOSO);

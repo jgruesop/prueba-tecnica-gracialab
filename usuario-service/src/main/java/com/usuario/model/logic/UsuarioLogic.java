@@ -4,9 +4,12 @@ import com.usuario.model.dto.LoginRegistroDTO;
 import com.usuario.model.dto.UsuarioRegistroDTO;
 import com.usuario.model.entity.Rol;
 import com.usuario.model.entity.Usuario;
+import com.usuario.model.util.MensajeToken;
 import com.usuario.model.util.Mensajes;
 import com.usuario.pojo.RespuestaMensajePojo;
+import com.usuario.pojo.RespuestaTokenPojo;
 import com.usuario.service.IUsuarioService;
+import com.usuario.service.Token;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,11 +30,13 @@ public class UsuarioLogic {
     private final IUsuarioService usuarioService;
     private final Mensajes mensajes;
     private final PasswordEncoder passwordEncoder;
+    private final MensajeToken mensajeToken;
 
-    public UsuarioLogic(IUsuarioService usuarioService, Mensajes mensajes, PasswordEncoder passwordEncoder) {
+    public UsuarioLogic(IUsuarioService usuarioService, Mensajes mensajes, PasswordEncoder passwordEncoder, MensajeToken mensajeToken) {
         this.usuarioService = usuarioService;
         this.mensajes = mensajes;
         this.passwordEncoder = passwordEncoder;
+        this.mensajeToken = mensajeToken;
     }
 
     public ResponseEntity validarUsuario(UsuarioRegistroDTO usuarioRegistroDTO) {
@@ -104,6 +109,8 @@ public class UsuarioLogic {
         if(!usuario.getRoles().getNombre().equals("ADMIN") && !usuario.getRoles().getNombre().equals("admin"))
             return mensajes.usuarioSinPermisos();
 
-        return mensajes.loginExitoso();
+        Token token = Token.of(usuario.getId(), 2L, "una_llave_secreta_muy_extensa_segura_y_confiable");
+
+        return mensajeToken.loginExitoso(token);
     }
 }
