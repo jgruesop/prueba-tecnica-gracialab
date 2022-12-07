@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class MensajeToken {
 
-    public ResponseEntity loginExitoso(Token token) {
-        RespuestaTokenPojo respuestaTokenPojo = new RespuestaTokenPojo(token.getToken().toString());
+    public ResponseEntity loginExitoso(String token) {
+        RespuestaTokenPojo respuestaTokenPojo = new RespuestaTokenPojo(token);
         return new ResponseEntity(respuestaTokenPojo, HttpStatus.OK);
     }
 }

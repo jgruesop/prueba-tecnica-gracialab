@@ -2,6 +2,7 @@ package com.usuario.service;
 
 import com.usuario.model.entity.Rol;
 import com.usuario.model.entity.Usuario;
+import com.usuario.pojo.RespuestaUsuarioPojo;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Optional;
@@ -10,7 +11,7 @@ public interface IUsuarioService {
 
     ResponseEntity listarUsuarios();
 
-    ResponseEntity buscarUsuario(Integer id);
+    RespuestaUsuarioPojo buscarUsuario(String id);
 
     Usuario registrarUsuario(Usuario usuario);
 

@@ -1,30 +1,58 @@
 package com.usuario.service;
 
+import com.usuario.model.dto.LoginRegistroDTO;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Getter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.nio.charset.StandardCharsets;
-import java.sql.Date;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
+import java.util.Date;
 
+@ConstructorBinding
+@ConfigurationProperties
 @Getter
 public class Token {
-    private final String token;
+    private String token;
+    private final static String TOKEN_SECRETO_ACCESO = "unallavesecretamuyextensasegurayconfiableparaelrestauranteshonatale";
+    private final static Long TOKEN_ACCESO_VALIDADO_EN_SEGUNDOS = 2L;
 
-    private Token(String token) {
+
+    private final LoginRegistroDTO loginRegistroDTO;
+    public Token(String token, LoginRegistroDTO loginRegistroDTO) {
         this.token = token;
+        this.loginRegistroDTO = loginRegistroDTO;
     }
 
-    public static Token of(Integer usuarioId, Long validacionEnMinutos, String llaveSecreta) {
-        var fechaExpedicion = Instant.now();
-        return new Token (Jwts.builder()
-                                        .claim("usuario_id", usuarioId)
-                                        .setIssuedAt(Date.from(fechaExpedicion))
-                                        .setExpiration(Date.from(fechaExpedicion.plus(validacionEnMinutos, ChronoUnit.MINUTES)))
-                                        .signWith(SignatureAlgorithm.HS256, Base64.getEncoder().encode(llaveSecreta.getBytes(StandardCharsets.UTF_8)))
-                                        .compact());
+    public String crearToken(String usuarioId) {
+
+        token = Jwts.builder()
+                .setSubject(usuarioId)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 100 * 60 * 60))
+                .signWith(SignatureAlgorithm.HS256, TOKEN_SECRETO_ACCESO)
+                .compact();
+        return token;
+    }
+
+    public boolean validarToken(String token, UserDetails userdetails) {
+        return userdetails.getUsername().equals(extraerUsernameDelToken(token)) && !haExpiradoElToken(token);
+    }
+
+    public String extraerUsernameDelToken(String token) {
+        return obtenerObjetosDelToken(token).getSubject();
+    }
+
+    public boolean haExpiradoElToken(String token) {
+        return obtenerObjetosDelToken(token).getExpiration().before(new java.util.Date());
+    }
+
+    public Claims obtenerObjetosDelToken(String token) {
+        return Jwts.parser().setSigningKey(TOKEN_SECRETO_ACCESO).parseClaimsJws(token).getBody();
+                //(Claims) Jwts.parserBuilder().requireAudience(TOKEN_SECRETO_ACCESO).build().parse(token);
     }
 }

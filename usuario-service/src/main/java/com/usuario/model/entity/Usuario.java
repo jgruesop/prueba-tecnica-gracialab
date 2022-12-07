@@ -1,28 +1,26 @@
 package com.usuario.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.data.annotation.PersistenceConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Entity
-@Table(name = "usuario")
-@Getter
-@Setter
-@AllArgsConstructor @NoArgsConstructor
+@Entity @Table(name = "usuario", uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor
 public class Usuario implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "id_usuario")
+    private Integer idUsuario;
     private String nombre;
     private String apellido;
     private String email;
     private String password;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
-    @JoinColumn( name = "id_rol")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ManyToOne()
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Rol roles;
 
     public static Usuario of(String nombre, String apellido, String email, String password, Rol roles) {

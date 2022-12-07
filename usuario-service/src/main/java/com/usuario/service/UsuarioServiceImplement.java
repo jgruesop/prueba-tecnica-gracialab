@@ -6,31 +6,24 @@ import com.usuario.model.util.Mensajes;
 import com.usuario.pojo.RespuestaUsuarioPojo;
 import com.usuario.repository.IRolRepository;
 import com.usuario.repository.IUsuarioRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 
-@Service
+@Service @Transactional @RequiredArgsConstructor @Slf4j
 public class UsuarioServiceImplement implements IUsuarioService{
 
     private final IUsuarioRepository usuarioRepository;
     private final IUsuarioRepository iUsuarioRepository;
     private final IRolRepository rolRepository;
     private final Mensajes mensajes;
-    private final PasswordEncoder passwordEncoder;
-
-    public UsuarioServiceImplement(IUsuarioRepository usuarioRepository, IUsuarioRepository iUsuarioRepository, IRolRepository rolRepository, Mensajes mensajes, PasswordEncoder passwordEncoder) {
-        this.usuarioRepository = usuarioRepository;
-        this.iUsuarioRepository = iUsuarioRepository;
-        this.rolRepository = rolRepository;
-        this.mensajes = mensajes;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -42,21 +35,22 @@ public class UsuarioServiceImplement implements IUsuarioService{
     }
 
     @Override
-    public ResponseEntity buscarUsuario(Integer id) {
-        List<Usuario> resultado = iUsuarioRepository.buscarIdUsuario(id);
+    public RespuestaUsuarioPojo buscarUsuario(String id) {
+        Usuario usuarioBD = iUsuarioRepository.buscarIdUsuario(id);
+        System.out.println("usuarioBD.getIdUsuario() = " + usuarioBD.getIdUsuario());
         RespuestaUsuarioPojo respuestaUsuarioPojo = new RespuestaUsuarioPojo();
-        if(!resultado.isEmpty()) {
-            for(Usuario usuario : resultado) {
-                respuestaUsuarioPojo.setId(usuario.getId());
-                respuestaUsuarioPojo.setNombre(usuario.getNombre());
-                respuestaUsuarioPojo.setApellido(usuario.getApellido());
-                respuestaUsuarioPojo.setEmail(usuario.getEmail());
-                respuestaUsuarioPojo.setRol(String.valueOf((usuario.getRoles())));
-            }
-        }else {
-            return mensajes.usuarioNoExiste();
-        }
-        return new ResponseEntity(respuestaUsuarioPojo, HttpStatus.OK);
+
+        if(Objects.isNull(usuarioBD))
+            mensajes.usuarioNoExiste();
+
+        respuestaUsuarioPojo.setId(usuarioBD.getIdUsuario());
+        respuestaUsuarioPojo.setNombre(usuarioBD.getNombre());
+        respuestaUsuarioPojo.setApellido(usuarioBD.getApellido());
+        respuestaUsuarioPojo.setEmail(usuarioBD.getEmail());
+        respuestaUsuarioPojo.setEmail(usuarioBD.getPassword());
+        respuestaUsuarioPojo.setRol(Collections.singleton(usuarioBD.getRoles()));
+
+        return respuestaUsuarioPojo;
     }
 
     @Override
@@ -66,16 +60,17 @@ public class UsuarioServiceImplement implements IUsuarioService{
 
     @Override
     public String buscarEmail(String email) {
-        return iUsuarioRepository.buscarEmail(email);
+        var usuario = iUsuarioRepository.findByEmail(email);
+        return usuario.getEmail();
     }
 
     @Override
     public ResponseEntity<Usuario> modificarUsuario(Usuario usuario) {
-        Usuario usuarioDB = (Usuario) iUsuarioRepository.buscarIdUsuario(usuario.getId());
+        Usuario usuarioDB = iUsuarioRepository.buscarIdUsuario(usuario.getIdUsuario().toString());
         if (usuarioDB == null) {
             return null;
         }
-        usuarioDB.setId(usuario.getId());
+        usuarioDB.setIdUsuario(usuario.getIdUsuario());
         usuarioDB.setNombre(usuario.getNombre());
         usuarioDB.setApellido(usuario.getApellido());
         usuarioDB.setEmail(usuario.getEmail());
@@ -92,6 +87,6 @@ public class UsuarioServiceImplement implements IUsuarioService{
     @Override
     public Optional<Usuario> login(String email, String password) {
         var usuario = usuarioRepository.findByEmail(email);
-        return usuario;
+        return Optional.ofNullable(usuario);
     }
 }

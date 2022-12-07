@@ -6,8 +6,9 @@ import com.usuario.model.entity.Rol;
 import com.usuario.model.entity.Usuario;
 import com.usuario.model.util.MensajeToken;
 import com.usuario.model.util.Mensajes;
+import com.usuario.pojo.RespuestaLoginPojo;
 import com.usuario.pojo.RespuestaMensajePojo;
-import com.usuario.pojo.RespuestaTokenPojo;
+import com.usuario.pojo.RespuestaUsuarioPojo;
 import com.usuario.service.IUsuarioService;
 import com.usuario.service.Token;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -31,12 +36,16 @@ public class UsuarioLogic {
     private final Mensajes mensajes;
     private final PasswordEncoder passwordEncoder;
     private final MensajeToken mensajeToken;
+    private final Token tokens;
 
-    public UsuarioLogic(IUsuarioService usuarioService, Mensajes mensajes, PasswordEncoder passwordEncoder, MensajeToken mensajeToken) {
+
+    public UsuarioLogic(IUsuarioService usuarioService, Mensajes mensajes,
+                        PasswordEncoder passwordEncoder, MensajeToken mensajeToken, Token tokens) {
         this.usuarioService = usuarioService;
         this.mensajes = mensajes;
         this.passwordEncoder = passwordEncoder;
         this.mensajeToken = mensajeToken;
+        this.tokens = tokens;
     }
 
     public ResponseEntity validarUsuario(UsuarioRegistroDTO usuarioRegistroDTO) {
@@ -48,8 +57,7 @@ public class UsuarioLogic {
             if(Objects.isNull(usuarioRegistroDTO.getApellido()) || usuarioRegistroDTO.getApellido().isEmpty()) {
                 return mensajes.validarInformacionApellidos();
             }
-            if(Objects.isNull(usuarioRegistroDTO.getEmail()) || usuarioRegistroDTO.getEmail().isEmpty()
-                        || mather.find() == false) {
+            if(Objects.isNull(usuarioRegistroDTO.getEmail()) || usuarioRegistroDTO.getEmail().isEmpty()                        || mather.find() == false) {
                 return mensajes.validarInformacionEmail();
             }
             if(Objects.isNull(usuarioRegistroDTO.getPassword()) || usuarioRegistroDTO.getPassword().isEmpty()) {
@@ -59,16 +67,17 @@ public class UsuarioLogic {
                 return mensajes.validarInformacionRol();
             }
             if(validarExistenciaUsuarioPorEmail(usuarioRegistroDTO.getEmail()) == null) {
-                    Rol rol = new Rol(usuarioRegistroDTO.getRol().trim().toLowerCase());
-                    guardarRol(rol);
-                    guardarUsuario(Usuario.of(usuarioRegistroDTO.getNombre().trim().toLowerCase(),
-                            usuarioRegistroDTO.getApellido().trim().toLowerCase(),
-                            usuarioRegistroDTO.getEmail().trim(),
-                            passwordEncoder.encode(usuarioRegistroDTO.getPassword()), rol ));
-                    return mensajes.registroExitoso();
-            }else {
-                return validarExistenciaUsuarioPorEmail(usuarioRegistroDTO.getEmail());
+                Rol rol = new Rol(usuarioRegistroDTO.getRol().trim().toLowerCase());
+                guardarRol(rol);
+                guardarUsuario(Usuario.of(usuarioRegistroDTO.getNombre().trim().toLowerCase(),
+                        usuarioRegistroDTO.getApellido().trim().toLowerCase(),
+                        usuarioRegistroDTO.getEmail().trim(),
+                        passwordEncoder.encode(usuarioRegistroDTO.getPassword()), rol));
+                return mensajes.registroExitoso();
             }
+
+            return validarExistenciaUsuarioPorEmail(usuarioRegistroDTO.getEmail());
+
         } catch (Exception e) {
             LOGGER.info("Se produjo un error: " + e.getMessage());
         }
@@ -97,9 +106,11 @@ public class UsuarioLogic {
         return usuarioService.listarUsuarios();
     }
 
-    public ResponseEntity login(LoginRegistroDTO loginRegistroDTO) {
+    public ResponseEntity login(LoginRegistroDTO loginRegistroDTO, HttpServletResponse response) {
+
         var usuario = usuarioService.login(loginRegistroDTO.getEmail(), loginRegistroDTO.getPassword())
                 .orElse(null);
+
         if(Objects.isNull(usuario))
             return mensajes.credencialesNoCoinciden();
 
@@ -109,8 +120,21 @@ public class UsuarioLogic {
         if(!usuario.getRoles().getNombre().equals("ADMIN") && !usuario.getRoles().getNombre().equals("admin"))
             return mensajes.usuarioSinPermisos();
 
-        Token token = Token.of(usuario.getId(), 2L, "una_llave_secreta_muy_extensa_segura_y_confiable");
+        String token = tokens.crearToken(usuario.getIdUsuario().toString());
 
+        Cookie cookie = new Cookie("token", tokens.getToken());
+        cookie.setMaxAge(3600);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/restaurante-shonatale/api");
+        response.addCookie(cookie);
+
+        RespuestaLoginPojo respuestaLoginPojo = new RespuestaLoginPojo(usuario.getIdUsuario().toString(), usuario.getEmail(), usuario.getPassword(),
+                                                                        Collections.singleton(usuario.getRoles().getNombre()));
         return mensajeToken.loginExitoso(token);
+    }
+
+    public RespuestaUsuarioPojo acceso(HttpServletRequest request) {
+        var usuario = (Usuario) request.getAttribute("usuario");
+        return new RespuestaUsuarioPojo(usuario.getIdUsuario(), usuario.getNombre(), usuario.getApellido(), usuario.getEmail(),usuario.getPassword(), Collections.singleton(usuario.getRoles().getNombre()));
     }
 }

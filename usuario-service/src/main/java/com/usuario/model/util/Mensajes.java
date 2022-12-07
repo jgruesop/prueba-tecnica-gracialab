@@ -4,6 +4,7 @@ import com.usuario.pojo.RespuestaMensajePojo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class Mensajes {
@@ -14,7 +15,9 @@ public class Mensajes {
     public static final String ERROR_AL_REGISTRAR_EL_PASSWORD     = "Error al registrar el password";
     public static final String ERROR_AL_REGISTRAR_CAMPO_ROL       = "Error al registrar el campo rol";
     public static final String REGISTRO_EXITOSO                   = "Registro exitoso";
-    //public static final String LOGIN_EXITOSO                      = token.getToken();
+
+    public static final String ERROR_TOKEN                        = "Error en el token";
+    public static final String ERROR_TOKEN_BARRER                 = "Error en el token del portador";
     public static final String CREDENCIALES_NO_COINCIDEN          = "Credenciales invalidas";
     public static final String CAMBIOS_APLICADOS_EXITOSAMENTE     = "Cambios aplicados exitosamente";
     public static final String USUARIO_NO_EXISTE                  = "Usuario no existe";
@@ -22,7 +25,10 @@ public class Mensajes {
     public static final String USUARIO_SIN_PERMISOS               = "Usuario sin permisos";
 
 
-
+    public ResponseEntity errorToken() {
+        RespuestaMensajePojo respuestaMensajePojo = new RespuestaMensajePojo(ERROR_TOKEN);
+        return new ResponseEntity(respuestaMensajePojo, HttpStatus.BAD_REQUEST);
+    }
     public ResponseEntity noExistenResgistros() {
         RespuestaMensajePojo respuestaMensajePojo = new RespuestaMensajePojo(NO_EXISTEN_REGISTROS);
         return new ResponseEntity(respuestaMensajePojo, HttpStatus.NOT_FOUND);
@@ -63,7 +69,10 @@ public class Mensajes {
         RespuestaMensajePojo respuestaMensajePojo = new RespuestaMensajePojo(ERROR_AL_REGISTRAR_CAMPO_ROL);
         return new ResponseEntity(respuestaMensajePojo, HttpStatus.BAD_REQUEST);
     }
-
+    public ResponseStatusException errorTokenBearer() {
+        RespuestaMensajePojo respuestaMensajePojo = new RespuestaMensajePojo(ERROR_TOKEN_BARRER);
+        return new ResponseStatusException(HttpStatus.FORBIDDEN, respuestaMensajePojo.toString());
+    }
     public ResponseEntity usuarioSinPermisos() {
         RespuestaMensajePojo respuestaMensajePojo = new RespuestaMensajePojo(USUARIO_SIN_PERMISOS);
         return new ResponseEntity(respuestaMensajePojo, HttpStatus.UNAUTHORIZED);
