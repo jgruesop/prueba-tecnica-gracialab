@@ -6,11 +6,10 @@ import com.usuario.model.entity.Rol;
 import com.usuario.model.entity.Usuario;
 import com.usuario.model.util.MensajeToken;
 import com.usuario.model.util.Mensajes;
-import com.usuario.pojo.RespuestaLoginPojo;
 import com.usuario.pojo.RespuestaMensajePojo;
 import com.usuario.pojo.RespuestaUsuarioPojo;
 import com.usuario.service.IUsuarioService;
-import com.usuario.service.Token;
+import com.usuario.service.TokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,11 +35,11 @@ public class UsuarioLogic {
     private final Mensajes mensajes;
     private final PasswordEncoder passwordEncoder;
     private final MensajeToken mensajeToken;
-    private final Token tokens;
+    private final TokenService tokens;
 
 
     public UsuarioLogic(IUsuarioService usuarioService, Mensajes mensajes,
-                        PasswordEncoder passwordEncoder, MensajeToken mensajeToken, Token tokens) {
+                        PasswordEncoder passwordEncoder, MensajeToken mensajeToken, TokenService tokens) {
         this.usuarioService = usuarioService;
         this.mensajes = mensajes;
         this.passwordEncoder = passwordEncoder;
@@ -57,7 +56,7 @@ public class UsuarioLogic {
             if(Objects.isNull(usuarioRegistroDTO.getApellido()) || usuarioRegistroDTO.getApellido().isEmpty()) {
                 return mensajes.validarInformacionApellidos();
             }
-            if(Objects.isNull(usuarioRegistroDTO.getEmail()) || usuarioRegistroDTO.getEmail().isEmpty()                        || mather.find() == false) {
+            if(Objects.isNull(usuarioRegistroDTO.getEmail()) || usuarioRegistroDTO.getEmail().isEmpty() || !mather.find()) {
                 return mensajes.validarInformacionEmail();
             }
             if(Objects.isNull(usuarioRegistroDTO.getPassword()) || usuarioRegistroDTO.getPassword().isEmpty()) {
@@ -128,8 +127,6 @@ public class UsuarioLogic {
         cookie.setPath("/restaurante-shonatale/api");
         response.addCookie(cookie);
 
-        RespuestaLoginPojo respuestaLoginPojo = new RespuestaLoginPojo(usuario.getIdUsuario().toString(), usuario.getEmail(), usuario.getPassword(),
-                                                                        Collections.singleton(usuario.getRoles().getNombre()));
         return mensajeToken.loginExitoso(token);
     }
 

@@ -1,7 +1,6 @@
 package com.usuario.model.util;
 
 import com.usuario.pojo.RespuestaTokenPojo;
-import com.usuario.service.Token;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

@@ -3,21 +3,19 @@ package com.usuario.service;
 import com.usuario.model.entity.Rol;
 import com.usuario.model.entity.Usuario;
 import com.usuario.model.util.Mensajes;
-import com.usuario.pojo.RespuestaUsuarioPojo;
+import com.usuario.pojo.RespuestaLoginPojo;
 import com.usuario.repository.IRolRepository;
 import com.usuario.repository.IUsuarioRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Optional;
 
-@Service @Transactional @RequiredArgsConstructor @Slf4j
+@Service @Transactional @RequiredArgsConstructor
 public class UsuarioServiceImplement implements IUsuarioService{
 
     private final IUsuarioRepository usuarioRepository;
@@ -35,22 +33,18 @@ public class UsuarioServiceImplement implements IUsuarioService{
     }
 
     @Override
-    public RespuestaUsuarioPojo buscarUsuario(String id) {
-        Usuario usuarioBD = iUsuarioRepository.buscarIdUsuario(id);
-        System.out.println("usuarioBD.getIdUsuario() = " + usuarioBD.getIdUsuario());
-        RespuestaUsuarioPojo respuestaUsuarioPojo = new RespuestaUsuarioPojo();
-
-        if(Objects.isNull(usuarioBD))
-            mensajes.usuarioNoExiste();
-
-        respuestaUsuarioPojo.setId(usuarioBD.getIdUsuario());
-        respuestaUsuarioPojo.setNombre(usuarioBD.getNombre());
-        respuestaUsuarioPojo.setApellido(usuarioBD.getApellido());
-        respuestaUsuarioPojo.setEmail(usuarioBD.getEmail());
-        respuestaUsuarioPojo.setEmail(usuarioBD.getPassword());
-        respuestaUsuarioPojo.setRol(Collections.singleton(usuarioBD.getRoles()));
-
-        return respuestaUsuarioPojo;
+    public RespuestaLoginPojo findByIdUsuario(String id) {
+        var usuarioBD = iUsuarioRepository.findByIdUsuario(id);
+        RespuestaLoginPojo respuestaLoginPojo = new RespuestaLoginPojo();
+        if(!usuarioBD.isEmpty()) {
+        }
+        for (Usuario usuario : usuarioBD) {
+            respuestaLoginPojo.setId(usuario.getIdUsuario());
+            respuestaLoginPojo.setEmail(usuario.getEmail());
+            respuestaLoginPojo.setPassword(usuario.getPassword());
+            respuestaLoginPojo.setRol(Collections.singleton(usuario.getRoles().getNombre()));
+        }
+        return respuestaLoginPojo;
     }
 
     @Override
@@ -63,10 +57,10 @@ public class UsuarioServiceImplement implements IUsuarioService{
         var usuario = iUsuarioRepository.findByEmail(email);
         return usuario.getEmail();
     }
-
+/*
     @Override
     public ResponseEntity<Usuario> modificarUsuario(Usuario usuario) {
-        Usuario usuarioDB = iUsuarioRepository.buscarIdUsuario(usuario.getIdUsuario().toString());
+        var usuarioDB = iUsuarioRepository.findByIdUsuario(usuario.getIdUsuario());
         if (usuarioDB == null) {
             return null;
         }
@@ -78,7 +72,7 @@ public class UsuarioServiceImplement implements IUsuarioService{
         usuarioRepository.save(usuarioDB);
         return mensajes.cambiosAplicadosExitosamente();
     }
-
+*/
     @Override
     public Rol registrarRol(Rol rol) {
         return rolRepository.save(rol);

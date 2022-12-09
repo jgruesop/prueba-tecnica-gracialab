@@ -20,21 +20,21 @@ public class AuthController {
     }
 
     public ResponseEntity login(@RequestBody LoginRegistroDTO loginRequestDTO, HttpServletResponse response) {
-        return this.usuarioLogic.login(loginRequestDTO, response);
+        return usuarioLogic.login(loginRequestDTO, response);
     }
 
     public RespuestaUsuarioPojo usuario(HttpServletRequest request) {
         return usuarioLogic.acceso(request);
     }
     public ResponseEntity listarUsuarios() {
-        return this.usuarioLogic.listarUsuarios();
+        return usuarioLogic.listarUsuarios();
     }
 
     public ResponseEntity registrar( UsuarioRegistroDTO usuarioRegistroDTO) {
-        return this.usuarioLogic.validarUsuario(usuarioRegistroDTO);
+        return usuarioLogic.validarUsuario(usuarioRegistroDTO);
     }
 
     public ResponseEntity modificar(@RequestBody UsuarioRegistroDTO usuarioRegistroDTO) {
-        return this.usuarioLogic.validarUsuario(usuarioRegistroDTO);
+        return usuarioLogic.validarUsuario(usuarioRegistroDTO);
     }
 }

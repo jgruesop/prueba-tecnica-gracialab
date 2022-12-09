@@ -1,7 +1,7 @@
 package com.usuario.security.filter;
 
 import com.usuario.model.util.Mensajes;
-import com.usuario.service.Token;
+import com.usuario.service.TokenService;
 import com.usuario.service.UsuarioDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,12 +22,12 @@ public class JWTFilterRequest extends OncePerRequestFilter {
 
 
     private final UsuarioDetailsService usuarioDetailsService;
-    private final Token token;
+    private final TokenService tokenService;
     private final Mensajes mensajes;
 
-    public JWTFilterRequest(UsuarioDetailsService usuarioDetailsService, Token token, Mensajes mensajes) {
+    public JWTFilterRequest(UsuarioDetailsService usuarioDetailsService, TokenService tokenService, Mensajes mensajes) {
         this.usuarioDetailsService = usuarioDetailsService;
-        this.token = token;
+        this.tokenService = tokenService;
         this.mensajes = mensajes;
     }
 
@@ -41,14 +41,14 @@ public class JWTFilterRequest extends OncePerRequestFilter {
             if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
 
                 String jwt = authorizationHeader.substring(7);
-                String usuario = token.extraerUsernameDelToken(jwt);
+                String usuario = tokenService.extraerUsernameDelToken(jwt);
 
                 if(usuario != null && SecurityContextHolder.getContext().getAuthentication() != null)
                     mensajes.errorTokenBearer();
 
                 UserDetails userdetails = usuarioDetailsService.loadUserByUsername(usuario);
 
-                if(token.validarToken(jwt, userdetails)) {
+                if(tokenService.validarToken(jwt, userdetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userdetails.getUsername(),
                             userdetails.getPassword(),

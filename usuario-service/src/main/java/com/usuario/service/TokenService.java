@@ -9,21 +9,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @ConstructorBinding
 @ConfigurationProperties
 @Getter
-public class Token {
+public class TokenService {
     private String token;
     private final static String TOKEN_SECRETO_ACCESO = "unallavesecretamuyextensasegurayconfiableparaelrestauranteshonatale";
     private final static Long TOKEN_ACCESO_VALIDADO_EN_SEGUNDOS = 2L;
 
 
     private final LoginRegistroDTO loginRegistroDTO;
-    public Token(String token, LoginRegistroDTO loginRegistroDTO) {
+    public TokenService(String token, LoginRegistroDTO loginRegistroDTO) {
         this.token = token;
         this.loginRegistroDTO = loginRegistroDTO;
     }
