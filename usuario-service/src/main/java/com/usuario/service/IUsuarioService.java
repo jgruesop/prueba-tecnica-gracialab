@@ -3,6 +3,7 @@ package com.usuario.service;
 import com.usuario.model.entity.Rol;
 import com.usuario.model.entity.Usuario;
 import com.usuario.pojo.RespuestaLoginPojo;
+import com.usuario.pojo.RespuestaUsuarioPojo;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Optional;

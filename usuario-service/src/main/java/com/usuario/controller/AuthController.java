@@ -22,10 +22,10 @@ public class AuthController {
     public ResponseEntity login(@RequestBody LoginRegistroDTO loginRequestDTO, HttpServletResponse response) {
         return usuarioLogic.login(loginRequestDTO, response);
     }
-
+/*
     public RespuestaUsuarioPojo usuario(HttpServletRequest request) {
         return usuarioLogic.acceso(request);
-    }
+    }*/
     public ResponseEntity listarUsuarios() {
         return usuarioLogic.listarUsuarios();
     }
