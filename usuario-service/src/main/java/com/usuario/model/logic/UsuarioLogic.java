@@ -129,9 +129,9 @@ public class UsuarioLogic {
 
         return mensajeToken.loginExitoso(token);
     }
-
+/*
     public RespuestaUsuarioPojo acceso(HttpServletRequest request) {
         var usuario = (Usuario) request.getAttribute("usuario");
-        return new RespuestaUsuarioPojo(usuario.getIdUsuario(), usuario.getNombre(), usuario.getApellido(), usuario.getEmail(),usuario.getPassword(), Collections.singleton(usuario.getRoles().getNombre()));
-    }
+        return new RespuestaUsuarioPojo(usuario.getIdUsuario(), usuario.getEmail(),usuario.getPassword(), usuario.getRoles().getNombre());
+    }*/
 }

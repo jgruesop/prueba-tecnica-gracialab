@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/restaurante-shonatale/api")
+@RequestMapping("/restaurante-shonatale")
 public class UsuarioView {
 
     private final AuthController authController;
@@ -24,22 +25,22 @@ public class UsuarioView {
     public ResponseEntity login(@RequestBody LoginRegistroDTO loginRequestDTO, HttpServletResponse response) {
         return this.authController.login(loginRequestDTO, response);
     }
-
-    @GetMapping("/usuario")
+/*
+    @GetMapping("/api/usuario")
     public RespuestaUsuarioPojo usuario(HttpServletRequest request) {
         return this.authController.usuario(request);
-    }
+    }*/
 
-    @PostMapping("/usuario/registro")
+    @PostMapping("/api/usuario/registro")
     public ResponseEntity registrar(@RequestBody UsuarioRegistroDTO usuarioRegistroDTO) throws Exception {
         return this.authController.registrar(usuarioRegistroDTO);
     }
-    @GetMapping("/usuario/listar")
+    @GetMapping("/api/usuario/listar")
     public ResponseEntity listarUsuarios() throws Exception {
         return this.authController.listarUsuarios();
     }
 
-    @PutMapping("/usuario/modificar")
+    @PutMapping("/api/usuario/modificar")
     public ResponseEntity modificar(@RequestBody UsuarioRegistroDTO usuarioRegistroDTO) throws Exception {
         return this.authController.modificar(usuarioRegistroDTO);
     }

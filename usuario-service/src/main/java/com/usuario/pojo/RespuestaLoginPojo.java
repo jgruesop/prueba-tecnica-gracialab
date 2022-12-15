@@ -17,5 +17,5 @@ public class RespuestaLoginPojo {
     private Integer id;
     private String email;
     private String password;
-    private Collection rol;
+    private String rol;
 }
