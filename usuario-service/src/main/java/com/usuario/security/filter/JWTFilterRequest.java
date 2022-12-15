@@ -48,18 +48,20 @@ public class JWTFilterRequest extends OncePerRequestFilter {
 
                 UserDetails userdetails = usuarioDetailsService.loadUserByUsername(usuario);
 
+                System.out.println("userdetails.getAuthorities().toString() = " + userdetails.getAuthorities().toString());
+
                 if(tokenService.validarToken(jwt, userdetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userdetails.getUsername(),
-                            userdetails.getPassword(),
+                            userdetails,
+                            null,
                             userdetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-            filterChain.doFilter(request, response);
         }catch(Exception e) {
             log.info("Se produjo un error en la clase JTWFilterRequest: " + e.getMessage());
         }
+        filterChain.doFilter(request, response);
     }
 }

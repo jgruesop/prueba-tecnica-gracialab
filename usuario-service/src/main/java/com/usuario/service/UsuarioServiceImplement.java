@@ -4,16 +4,18 @@ import com.usuario.model.entity.Rol;
 import com.usuario.model.entity.Usuario;
 import com.usuario.model.util.Mensajes;
 import com.usuario.pojo.RespuestaLoginPojo;
+import com.usuario.pojo.RespuestaUsuarioPojo;
 import com.usuario.repository.IRolRepository;
 import com.usuario.repository.IUsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 
 @Service @Transactional @RequiredArgsConstructor
 public class UsuarioServiceImplement implements IUsuarioService{
@@ -26,23 +28,24 @@ public class UsuarioServiceImplement implements IUsuarioService{
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity listarUsuarios() {
-        if(!iUsuarioRepository.findAll().iterator().hasNext()) {
-            return mensajes.noExistenResgistros();
+        if(iUsuarioRepository.findAll().iterator().hasNext()) {
+            return new ResponseEntity(usuarioRepository.findAll(), HttpStatus.OK);
         }
-        return new ResponseEntity(usuarioRepository.findAll(), HttpStatus.OK);
+        return mensajes.noExistenResgistros();
     }
 
     @Override
     public RespuestaLoginPojo findByIdUsuario(String id) {
         var usuarioBD = iUsuarioRepository.findByIdUsuario(id);
         RespuestaLoginPojo respuestaLoginPojo = new RespuestaLoginPojo();
+
         if(!usuarioBD.isEmpty()) {
         }
         for (Usuario usuario : usuarioBD) {
             respuestaLoginPojo.setId(usuario.getIdUsuario());
             respuestaLoginPojo.setEmail(usuario.getEmail());
             respuestaLoginPojo.setPassword(usuario.getPassword());
-            respuestaLoginPojo.setRol(Collections.singleton(usuario.getRoles().getNombre()));
+            respuestaLoginPojo.setRol("ROL_" + usuario.getRoles().getNombre());
         }
         return respuestaLoginPojo;
     }
